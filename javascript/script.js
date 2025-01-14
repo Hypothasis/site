@@ -318,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
         console.log(pedido);
 
-        pedido = pedido.replace(/\n/g, '%0A');
+        //pedido = pedido.replace(/\n/g, '%0A');
 
         // Codificar a mensagem para garantir que caracteres especiais sejam tratados
         let encodedMessage = encodeURIComponent(pedido);
