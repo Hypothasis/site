@@ -241,94 +241,81 @@ document.addEventListener('DOMContentLoaded', function(){
         document.getElementById('total-value').textContent = `R$ ${total.toFixed(2)}`;
     }
   
-    document.getElementById('enviar').addEventListener('click', function (){
+ document.getElementById('enviar').addEventListener('click', function () {
+    let pedido = "";
+    let order = "";
+    let anyProduct = false;
 
-        pedido = ""
-        order = ""
+    const nome = document.getElementById('nome').value;
+    const bairro = document.getElementById('bairro').value;
+    const numCasa = document.getElementById('num-casa').value;
+    const comentario = document.getElementById('comentario').value;
 
-        let nome = document.getElementById('nome').value;
-        let bairro = document.getElementById('bairro').value;
-        let num_casa = document.getElementById('num-casa').value;
-        let comentario = document.getElementById('comentario').value;
-
-        // Iteração para capturar os produtos
-        inputs.forEach(input => {
-            if (parseInt(input.value) > 0) {
-                // Captura o nome do produto diretamente da label
-                let label = input.closest('label').textContent.trim(); // A label contém o nome do produto
-                // Quebra a string em partes usando o '\n' e pega a primeira parte
-                label = label.split('\n')[0].trim();
-                order = order.concat(`${label} - Quantidade: ${input.value}%0A`);
-                anyProduct = true
-            } 
-        });
-
-        if(anyProduct == false){
-            alert("Selecione algum produto no cardápio!")
-
-            return;
-        }   
-
-        pedido = pedido.concat(`Boa noite, me chamo ${nome} e esse é meu pedido:%0A`)
-
-        pedido = pedido.concat("%0A----------ENDEREÇO----------%0A%0A")
-
-        //Checa valores do endereço
-        if(nome == ""){
-            alert("Digite seu Nome")
-
-            return
+    // Iteração para capturar os produtos
+    inputs.forEach(input => {
+        if (parseInt(input.value) > 0) {
+            const label = input.closest('label').textContent.trim().split('\n')[0].trim();
+            order += `${label} - Quantidade: ${input.value}\n`; // Use \n para quebra de linha
+            anyProduct = true;
         }
+    });
 
-        if(bairro == "" ){
-            alert("Digite o Seu bairro")
+    if (!anyProduct) {
+        alert("Selecione algum produto no cardápio!");
+        return;
+    }
 
-            return
-        }
+    // Validações dos campos obrigatórios
+    if (!nome) {
+        alert("Digite seu Nome");
+        return;
+    }
 
-        if(num_casa == ""){
-            alert("Digite numero da sua Casa")
+    if (!bairro) {
+        alert("Digite o Seu bairro");
+        return;
+    }
 
-            return
-        }
+    if (!numCasa) {
+        alert("Digite o número da sua Casa");
+        return;
+    }
 
-        if(!dinheiro_active && !pix_active && !cartao_active){
-            alert("Selecione um Método de pagamento")
+    if (!dinheiro_active && !pix_active && !cartao_active) {
+        alert("Selecione um Método de pagamento");
+        return;
+    }
 
-            return
-        }
+    const metodoPagamento = dinheiro_active ? "Dinheiro" : pix_active ? "Pix" : "Cartão";
 
-        if(dinheiro_active){
-            pedido = pedido.concat(`Nome: ${nome}%0ABairro: ${bairro}%0AN°: ${num_casa}%0AComentario: ${comentario}%0AMétodo de Pagamento: Dinheiro%0A`);
-        }
+    // Construção do texto usando template string
+    pedido = `
+Boa noite, me chamo ${nome} e esse é meu pedido:
 
-        if(pix_active){
-            pedido = pedido.concat(`Nome: ${nome}%0ABairro: ${bairro}%0AN°: ${num_casa}%0AComentario: ${comentario}%0AMétodo de Pagamento: Pix%0A`);
-        }
+----------ENDEREÇO----------
 
-        if(cartao_active){
-            pedido = pedido.concat(`Nome: ${nome}%0ABairro: ${bairro}%0AN°: ${num_casa}%0AComentario: ${comentario}%0AMétodo de Pagamento: Cartão%0A`);
-        }
-        
-        pedido = pedido.concat("%0A-----------PEDIDO-----------%0A")
+Nome: ${nome}
+Bairro: ${bairro}
+N°: ${numCasa}
+Comentário: ${comentario || "Nenhum"}
+Método de Pagamento: ${metodoPagamento}
 
-        pedido = pedido.concat(order)
+-----------PEDIDO-----------
+${order}
 
-        pedido = pedido.concat("%0A----------------------------")
+----------------------------
+`;
 
-        console.log(pedido);
+    // Codificar a mensagem
+    const encodedMessage = encodeURIComponent(pedido);
 
-        //pedido = pedido.replace(/\n/g, '%0A');
+    // Criar o link para o WhatsApp
+    const whatsappLink = `https://wa.me/${phone}?text=${encodedMessage}`;
 
-        // Codificar a mensagem para garantir que caracteres especiais sejam tratados
-        let encodedMessage = encodeURIComponent(pedido);
+    // Abrir o WhatsApp
+    window.open(whatsappLink, '_blank');
+});
 
-        // Criar o link para o WhatsApp
-        let whatsappLink = `https://wa.me/${phone}?text=${encodedMessage}`;
-
-        // Redirecionar para o WhatsApp
-        window.open(whatsappLink, '_blank');
-    })
 
     /*           BOTOES              */
     let dinheiro = document.getElementById('dinheiro'); // Primeiro, pegamos o elemento
